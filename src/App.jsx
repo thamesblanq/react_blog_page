@@ -11,7 +11,6 @@ import { format } from 'date-fns';
 
 function App() {
 
-  const [search, setSearch] = useState('');
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -38,24 +37,27 @@ function App() {
       body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis consequatur expedita, assumenda similique non optio! Modi nesciunt excepturi corrupti atque blanditiis quo nobis, non optio quae possimus illum exercitationem ipsa!"
     }
   ]);
+  const [search, setSearch] = useState('');//searchBar's state
   const [searchResults, setSearchResults] = useState([]);
-  const navigate = useNavigate();
-  const [postTitle, setPostTitle] = useState('');
-  const [postBody, setPostBody] = useState('');
+  const [postTitle, setPostTitle] = useState('');//post's title state
+  const [postBody, setPostBody] = useState('');//post's body state
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const filteredResults = posts.filter(post => ((post.body).toLowerCase()).includes(search.toLowerCase())
     || ((post.title).toLowerCase()).includes(search.toLowerCase())
-    );
+    );//checking if the post's body or the post's title includes the search's value
     setSearchResults(filteredResults.reverse());
   }, [search, posts]);
  
+  //deleting a post by it's id
   const handleDelete = (id) => {
     const postsList = posts.filter(post => post.id !== id);
     setPosts(postsList);
     navigate('/');
   }  
 
+  //creating a new post/blog post
   const handleSubmit = (e) => {
     e.preventDefault();
     const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
