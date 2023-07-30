@@ -15,14 +15,14 @@ function App() {
 
   const [posts, setPosts] = useState([]);//post' array from db
   const [search, setSearch] = useState('');//searchBar's state
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);// array of posts that contains user's search history
   const [postTitle, setPostTitle] = useState('');//post's title state
   const [postBody, setPostBody] = useState('');//post's body state
   const [editBody, setEditBody] = useState('');// edit post body state
   const [editTitle, setEditTitle] = useState('');//edit post's title state
   const navigate = useNavigate(); 
 
-  //R- read
+  //R- read from db
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -43,17 +43,18 @@ function App() {
     fetchPosts();
   }, []);
 
+  //search posts
   useEffect(() => {
     const filteredResults = posts.filter(post => ((post.body).toLowerCase()).includes(search.toLowerCase())
     || ((post.title).toLowerCase()).includes(search.toLowerCase())
     );//checking if the post's body or the post's title includes the search's value
     setSearchResults(filteredResults.reverse());
   }, [search, posts]);
- 
+
 
   //creating a new post/blog post-- C- create
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault();//preventing the page refresh
     const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
     const datetime = format(new Date(), 'MMMM dd, yyyy pp'); 
     const newPost = { id, title: postTitle, datetime, body: postBody };
@@ -96,6 +97,7 @@ function App() {
       console.log(`Error: ${err.message}`);
     }
   }
+
 
   return (
     <Routes>
