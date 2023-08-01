@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import api from './api/posts';
 import EditPost from './EditPost';
+import useWindowSize from './hooks/useWindowSize';
+import useAxiosFetch from './hooks/useAxiosFetch';
 
 
 function App() {
@@ -21,9 +23,11 @@ function App() {
   const [editBody, setEditBody] = useState('');// edit post body state
   const [editTitle, setEditTitle] = useState('');//edit post's title state
   const navigate = useNavigate(); 
+  const { width } = useWindowSize();
+  const { data, fetchError, isLoading } = useAxiosFetch('http://localhost:3500/posts');
 
   //R- read from db
-  useEffect(() => {
+/*   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const response = await api.get('/posts');
@@ -41,7 +45,11 @@ function App() {
     }
 
     fetchPosts();
-  }, []);
+  }, []); */
+
+  useEffect(() => {
+    setPosts(data);
+  }, [data])
 
   //search posts
   useEffect(() => {
@@ -101,8 +109,12 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Layout search={search} setSearch={setSearch} />}>
-        <Route index element={<Home posts={searchResults} />} />
+      <Route path="/" element={<Layout search={search} setSearch={setSearch} width={width} />}>
+        <Route index element={<Home 
+        posts={searchResults}
+        fetchError={fetchError}
+        isLoading={isLoading}
+        />} />
         <Route path="post">
           <Route index element={<NewPost
             handleSubmit={handleSubmit}
