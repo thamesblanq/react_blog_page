@@ -1,9 +1,19 @@
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
-import DataContext from './context/DataContext';
+import { useEffect } from 'react';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 
 const Nav = () => {
-  const { search, setSearch } = useContext(DataContext);
+  const posts = useStoreState((state) => state.posts);
+  const search = useStoreState((state) => state.search);
+  const setSearch = useStoreActions((actions) => actions.setSearch);
+  const setSearchResults = useStoreActions((actions) => actions.setSearchResults);
+
+  useEffect(() => {
+    const filteredResults = posts.filter(post => ((post.body).toLowerCase()).includes(search.toLowerCase())
+    || ((post.title).toLowerCase()).includes(search.toLowerCase())
+    );//checking if the post's body or the post's title includes the search's value
+    setSearchResults(filteredResults.reverse());
+  }, [search, posts, setSearchResults]);
 
   return (
     <nav className="Nav">

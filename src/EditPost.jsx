@@ -1,16 +1,22 @@
-import { useEffect, useContext, useState } from "react";
+import { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import DataContext from './context/DataContext';
+import { useStoreState, useStoreActions } from "easy-peasy";
 import { format } from 'date-fns';
-import api from './api/posts';
 
 const EditPost = () => {
-    const { posts, setPosts } = useContext(DataContext);
-    const { id } = useParams();//getting the id from the url
-    const post = posts.find(post => (post.id).toString() === id);//checking for the post with same id
-    const [editBody, setEditBody] = useState('');// edit post body state
-    const [editTitle, setEditTitle] = useState('');//edit post's title state
     const navigate = useNavigate();
+    const { id } = useParams();//getting the id from the url
+
+    const editTitle = useStoreState((state) => state.editTitle);
+    const editBody = useStoreState((state) => state.editBody);
+  
+    const editPost = useStoreActions((actions) => actions.editPost);
+    const setEditTitle = useStoreActions((actions) => actions.setEditTitle);
+    const setEditBody = useStoreActions((actions) => actions.setEditBody);
+
+    const getPostById = useStoreState((state) => state.getPostById);
+    const post = getPostById(id);
+    
 
     useEffect(() => {
         if(post) {
@@ -23,16 +29,8 @@ const EditPost = () => {
   const handleEdit = async (id) => {
     const datetime = format(new Date(), 'MMMM dd, yyyy pp'); 
     const updatedPost = { id, title: editTitle, datetime, body: editBody };
-    try {
-      const response = await api.put(`/posts/${id}`, updatedPost);
-      const newPost = posts.map(post => post.id === id ? { ...response.data } : post);//if the post id is equal to the id then change the entire post body else leave the post be
-      setPosts(newPost);
-      setEditTitle('');
-      setEditBody('');
-      navigate('/');
-    } catch (err) {
-      console.log(`Error: ${err.message}`);
-    }
+    editPost(updatedPost);
+    navigate(`/post/${id}`);
   }
 
   return (
@@ -57,7 +55,7 @@ const EditPost = () => {
                     onChange={(e) => setEditBody(e.target.value)}
                 >
                 </textarea>
-                <button type="submit" onClick={() => handleEdit(post.id)}>Submit</button>
+                <button type="button" onClick={() => handleEdit(post.id)}>Submit</button>
                 </form>
             </>
         } 
